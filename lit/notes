@@ -1,0 +1,36 @@
+vis1: visual signal from gap.
+vis2: visual signal from food.
+noise: exploration
+Pyrimadal cortical neuron: receives excitatatory GLU from visual inputs. inhibited by interneuron (are interneuron and inhibitary neuron the same thing?)
+interneuron: inhibitory neuron
+action selection a:
+
+5HT: serotonin
+Gaba: inhibits the neuron
+Glu: glutamate; excites pyramidal neuron. (acts via standard ampa receptors)
+
+AMPA- standard brain receptor
+
+5HTR1: receptor t 1; dexcreases membrane potential towards the resting potential of the neuron. makes harder the neuron to fire.
+
+5HTR2: receptor t 2; increases membrane potential similar to GLU. help pyramidal neuron to fire.
+
+
+hypothesis 1: seratonin is associated with focus and sticking to a plan. 5HT. we want to include both 5HTR1 and 5HTR2 receptors. 
+
+hypothesis 2: only 5HTR2 receptors. 
+
+questions:
+
+is step 2, does the seratonin make the animal wait? 
+
+
+design ideas:
+
+each neuron a process sending and reciving 5HT etc via channels. 
+
+could express equation using weird float system or something else.
+
+uppaal
+
+would likely be better to go with SMC then EMC, so we should either use prism or uppaal. investigate time component of uppaal.
