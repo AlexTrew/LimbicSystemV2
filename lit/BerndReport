@@ -1,0 +1,22 @@
+Hi
+
+I am trying to figure out which model checker would be the most appropriate for checking the properies that we wish to investigate.
+
+Spin was used for the model I wrote for the dissertation. Spin is designed to focus on checking interprocess communication and checking the state space to see if a property holds, or does not hold. If we are trying to find out whether having both the 5HTR1 and the 5HTR2, or just the 5HTR2, will generally be more successful, I don't think this model checker will be appropriate.
+
+
+Prism is a probablablistic model checker. We can use this to determine the probablility of certain outcomes occurring in a system. We can use this to find out whether the Nutt hypothesis or your hypothesis is more likely to produce a better result.
+
+an example is linked here:
+
+http://www.prismmodelchecker.org/casestudies/cyclin.php
+
+
+Uppaal allows us to include the concept of time in our model by using logical clocks. I am unsure of how important time will be in our model. Uppaal can also model probabilities.
+
+here is a simple example:
+
+http://www.comp.nus.edu.sg/~cs5270/Notes/chapt6a.pdf
+
+
+I think that either Prism or Uppaal would be appropriate for developin the model. If you have any thoughts on which model checker I should use, let me know!
