@@ -1,0 +1,31 @@
+dtmc
+
+const double beta = 0.1;
+const double omega;
+global _5ht : int init 0;
+
+module _5ht_hypothesis
+	gap_approached	: bool;
+	food_consumed	: bool;
+	can_see_gap 	: [0..1] init 0;
+	can_see_food 	: [0..1] init 0;
+
+	[gap_seen] alpha > 0 & gap_approached = false -> 
+		1 : (gap_approached' = true);
+
+	[food_seen] alpha > 0 & can_see_food = 1 & gap_approached = true -> 
+		1 : (food_consumed' = true);
+
+	[] gap_approached = true -> 1 : (_5ht' = 5); 
+	[] gap_approached = false -> 1 : (_5ht' = 0); 
+
+	
+		
+
+endmodule
+
+formula alpha = omega * ( (beta + (can_see_gap + can_see_food) * _5ht) / (1 + _5ht) );
+
+label "food_seen" = can_see_food = 1;
+	
+
