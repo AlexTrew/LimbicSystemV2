@@ -1,0 +1,38 @@
+body {
+	background-color:#ffffff;
+	margin:0px;
+	padding:0px;
+}
+
+div#layout-maincontainer {
+	margin-left:0px;
+}
+div#layout-main {
+	width:100%;
+	margin:0px;
+}
+div#layout-leftcol {
+	display:none;
+	width:0px;
+}
+div#layout-footer {
+	display:none;
+}
+
+#prism-banner {
+	display:none;
+}
+#prism-navbar {
+	display:none;
+}
+
+#prism-mainbox {
+	margin:0;
+	border:none;
+	background-color:#ffffff;
+	padding:5px 20px 20px 20px;
+}
+
+#prism-unilogo {
+	display:none;
+}

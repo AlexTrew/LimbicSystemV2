@@ -1,30 +1,41 @@
-dtmc
+ctmc
 
 const double beta = 0.1;
-const double omega;
+const double e = 2.718281828459045;
+const double omega1;
+const double omega2;
 global _5ht : int init 0;
 
 module _5ht_hypothesis
 	gap_approached	: bool;
+	food_appeared : bool;
 	food_consumed	: bool;
 	can_see_gap 	: [0..1] init 0;
 	can_see_food 	: [0..1] init 0;
 
-	[gap_seen] alpha > 0 & gap_approached = false -> 
-		1 : (gap_approached' = true);
+	[explore] gap_approached=false & can_see_gap= 0 -> 0.3 : (can_see_gap' = 1); // redo step. find out how
+		 
+	[explore] alpha > omega1 -> 1: (gap_approached' = true); 
 
-	[food_seen] alpha > 0 & can_see_food = 1 & gap_approached = true -> 
-		1 : (food_consumed' = true);
+	[awaiting_food] gap_approached = true -> 0.1 : (food_appeared' = true); //redo step . find out how
 
-	[] gap_approached = true -> 1 : (_5ht' = 5); 
-	[] gap_approached = false -> 1 : (_5ht' = 0); 
+	[awaiting_food] food_appeared = true -> 1 : (can_see_food' = 1);
+ 
+	[consuming_food] alpha > omega2 -> (food_consumed' = true);
+	
 
 	
 		
 
 endmodule
 
-formula alpha = omega * ( (beta + (can_see_gap + can_see_food) * _5ht) / (1 + _5ht) );
+formula w = 1 - pow(e,pow(-(beta + can_see_gap + can_see_food)/(1 + _5ht),(1 + _5ht)));
+
+formula alpha = omega1 * w * (1 + _5ht);
+
+
+
+
 
 label "food_seen" = can_see_food = 1;
 	

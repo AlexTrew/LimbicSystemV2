@@ -1,0 +1,72 @@
+
+/* ============================================================== */
+
+/* Bib list */
+
+.biblist-block-header h3 {
+	padding:2px 5px 2px 5px;
+	border:solid 1px #dddd99;
+	background:#ffffcc;
+}
+   
+.biblist-section-header h3, .biblist-section-header h5 {
+	padding:2px 5px 2px 5px;
+	border:solid 1px #dddd99;
+	background:#ffffcc;
+}
+   
+ul.biblist-block {
+}
+
+li.biblist-item {
+	padding-bottom: 10px;
+}
+
+/* ============================================================== */
+
+/* Box containing detailed info on a pub item */
+
+.bibbox {
+	margin-right:100px;
+	background-color: #ffffff;
+}
+.bibbox tr.bibbox-row-alt1 td {
+}
+.bibbox tr.bibbox-row-alt2 {
+}
+.bibbox td.bibbox-td {
+	padding:7px;
+}
+.bibbox td.bibbox-td div {
+	padding-left:20px;
+}
+.bibbox-abstract {
+	padding:10px 20px 20px 20px;
+	margin:10px 100px 10px 20px;
+	border:solid 1px #dddd99;
+	background:#ffffcc;
+	/*min-height:150px;*/
+}
+
+/* ============================================================== */
+
+/* Individual components of each bib item description
+   Use "display:block;" to put the component on it's own line
+   Use "display:none;" to hide the component */
+
+.bib-key { display:block; font-weight:bold; color:#006600; }
+.bibbox .bib-key { color:#006600; }
+.bib-auth { display:block; }
+.bib-title { display:block; font-weight:bold; }
+.bibbox .bib-title { font-size:14pt; }
+.bib-src { } /* display:block; } */
+.bib-date { } /* display:block; } */ /* date = month + year */
+.bib-month { }
+.bib-year { }
+.bib-files { display:none; }
+.bib-url { display:none; }
+.bib-synop { display:block; color:#666666; margin-top:2px; }
+.bib-highlight { background-color:#CCFF99; border-bottom:solid 1px #669966; }
+
+/* ============================================================== */
+
