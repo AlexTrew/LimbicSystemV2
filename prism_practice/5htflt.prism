@@ -1,0 +1,59 @@
+ctmc
+
+//values for agent process
+
+const double beta = 0.1;
+const double e = 2.718281828459045;
+
+
+
+
+//locations in area
+
+const int l;
+const int approach_gap; 
+const int wait_at_gap;
+const int at_reward_location;
+
+
+
+
+
+
+module _5ht_hypothesis
+	
+	speed : [0..4] init 0;
+	_5HT : [0..3] init 0;
+	vis1 : [0..1] init 0;
+	vis2 : [0..1] init 0;
+	pos : [0..10] init 0;
+	move_to_reward : bool init false; //agent is attempting to move to reward, allowing for orientation adjustment
+	orientation_correct: bool init false; //agent is at reward location following orientation adjustment
+	reward_present : bool init false; //reward has appeared at reward location
+
+	[updatePosition] pos<=l -> (speed' = 4 - _5HT); 
+
+	[updatePosition] pos<=l -> (pos'= pos + speed); 
+
+	[seesGap] vis1=0 -> 0.2 : (vis1'=1); 
+	[entersPF] pos>=approach_gap & pos<wait_at_gap -> (_5HT'= 1);
+	[inFrontOfGap] pos>=wait_at_gap -> (_5HT'= 3);
+	[moveToReward] pos=l -> (move_to_reward'=true);
+	[correctOrientation] move_to_reward = true -> 0.3 : (orientation_correct'=true);//
+	
+	
+	
+		
+
+endmodule
+
+
+
+
+
+
+
+
+
+	
+

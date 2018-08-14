@@ -1,4 +1,4 @@
-ctmc
+dtmc
 
 //values for agent process (not used)
 
@@ -33,7 +33,7 @@ module _5ht_hypothesis
 	reward_not_collected : bool init false; //agent fails to collect reward
 
 
-	[seesGap] vis1=0 -> 10 : (vis1'=1) + 90: (vis1' = 0);
+	[seesGap] vis1=0 -> 0.1 : (vis1'=1) + 0.9 : (vis1' = 0);
 
 	[updatePosition] vis1=1 & pos<l & move_to_reward=false -> (pos'= pos + speed); 	
 
@@ -41,7 +41,7 @@ module _5ht_hypothesis
 	[entersPF] pos>=approach_gap & pos<wait_at_gap -> (_5HT'= 1);
 
 	[inFrontOfGap] pos>=wait_at_gap & _5HT<3 -> (_5HT'= 3);
-	[inFrontOfGap] pos< l & pos>=wait_at_gap & reward_present=false -> 10: (reward_present' = true) + 90: (reward_present'= false);
+	[inFrontOfGap] pos< l & pos>=wait_at_gap & reward_present=false -> 0.1 : (reward_present' = true) + 0.9 : (reward_present'= false);
 	
 	[seeReward] reward_present= true & vis2<5 -> (vis2'=5);
 
@@ -49,7 +49,7 @@ module _5ht_hypothesis
 	[moveToReward] pos>=l & move_to_reward=false -> (move_to_reward'=true);//the agent is moving to the location of the reward
 
 
-	[correctOrientation] move_to_reward = true & orientation_correct=false-> 30: (orientation_correct'=true) + 70: (orientation_correct'=false);//
+	[correctOrientation] move_to_reward = true & orientation_correct=false-> 0.3 : (orientation_correct'=true) + 0.7 : (orientation_correct'=false);//
 
 	
 	//end states
