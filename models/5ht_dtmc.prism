@@ -1,0 +1,62 @@
+dtmc
+
+const int approach_gap; //int defining the boundary of the pf associated with reward
+const int wait_at_gap; //int defining boundary of area "next to" gap containing reward
+const int l; //size of the scale representing the entire explorable area
+const int delay; //number of steps to wait to spawn reward once agent waits at gap
+
+global reward_present : bool init false;
+global s : [0..10] init 0;  //state counter to help ordering of events
+
+module limbic_system
+
+
+
+vis1 : [0..1] init 0;//1 if agent can see the gap
+vis2: [0..5] init 0;//1 if agent can see the reward
+_5ht : [0..3] init 0;// serotonin/5HTR1/5HTR2 value
+pos : [0..50] init 0;//position of agent
+
+
+
+
+orientation_correct : bool init false;
+at_reward : bool init false;
+collected_reward : bool init false;
+missed_reward : bool init false;
+
+[] s=0 -> 0.2 : (vis1'=1) & (s'=1) + 0.8 : (vis1'=0) & (s'=0); // see area containing reward and end exploration
+
+[updatePos] pos<(l-10) & s>=1 -> 1: (pos'=pos+speed); //update position by speed each step
+
+[] s=1 & pos>=approach_gap -> 1 : (_5ht'=1) & (s'=2); //enter the placefield and increase 5ht
+
+[] s=2 & pos>=wait_at_gap -> 1 : (_5ht'=3) & (s'=3); //slow down if front of gap, expected to contain reward
+
+[] s=3 & reward_present=true & vis2=0 -> 1 : (vis2'=5) & (s'=4); //agent sees reward and 
+[] s=3 & pos>=(l-10) -> 1: (s'=4); //agent reaches reward location; update state counter
+
+[] s=4 -> 0.2: (orientation_correct'=true) & (s'=5) + 0.8 : (orientation_correct'=false) & (s'=4); //correct orientation to get to reward location
+
+[] s=5 & orientation_correct=true & reward_present=true -> (collected_reward' = true) & (s'=6);
+[] s=5 & orientation_correct=true & reward_present=false -> (missed_reward'=true) & (s'=6);
+
+
+
+
+endmodule 
+
+module reward_spawner
+
+c : [0..delay] init 0;
+
+[] c=delay -> 1 : (reward_present'=true); 
+[] s=3 & c<delay-> 1: (c'=c+1);
+
+endmodule
+
+
+
+formula speed = ((3 - _5ht) + x);
+
+formula x = vis1 + vis2;
