@@ -6,8 +6,8 @@ const int l; //size of the scale representing the entire explorable area
 const int delay; //number of steps to wait to spawn reward once agent waits at gap
 const int reward_lifetime;
 
-global reward_present : bool init false;
-global s : [0..10] init 0;  //state counter to help ordering of events
+global reward_present : bool init false; 
+
 
 module limbic_system
 
@@ -16,8 +16,8 @@ module limbic_system
 vis1 : [0..1] init 0;//1 if agent can see the gap
 vis2: [0..5] init 0;//1 if agent can see the reward
 _5ht : [0..3] init 0;// serotonin/5HTR1/5HTR2 value
-pos : [0..50] init 0;//position of agent
-
+pos : [0..100] init 0;//position of agent
+s : [0..10] init 0;  //state counter to help ordering of events
 
 
 
@@ -28,19 +28,19 @@ missed_reward : bool init false;
 
 [] s=0 -> 0.2 : (vis1'=1) & (s'=1) + 0.8 : (vis1'=0) & (s'=0); // see area containing reward and end exploration
 
-[updatePos] pos<(l-10) & s>=1 -> 1: (pos'=pos+speed); //update position by speed each step
+[timed] pos<(l-10) & s>=1 -> 1: (pos'=pos+speed); //update position by speed each step
 
 [] s=1 & pos>=approach_gap -> 1 : (_5ht'=1) & (s'=2); //enter the placefield and increase 5ht
 
 [] s=2 & pos>=wait_at_gap -> 1 : (_5ht'=3) & (s'=3); //slow down if front of gap, expected to contain reward
 
-[] s=3 & reward_present=true & vis2=0 -> 1 : (vis2'=5); //agent sees reward and 
-[] s=3 & pos>=(l-10) -> 1: (s'=4); //agent reaches reward location; update state counter
+[timed] s=3 & reward_present=true & vis2=0 -> 1 : (vis2'=5); //agent sees reward and 
+[timed] s=3 & pos>=(l-10) -> 1: (s'=4); //agent reaches reward location; update state counter
 
-[] s=4 -> 0.2: (orientation_correct'=true) & (s'=5) + 0.8 : (orientation_correct'=false) & (s'=4); //correct orientation to get to reward location
+[timed] s=4 -> 0.2: (orientation_correct'=true) & (s'=5) + 0.8 : (orientation_correct'=false) & (s'=4); //correct orientation to get to reward location
 
-[] s=5 & orientation_correct=true & reward_present=true -> (collected_reward' = true) & (s'=6);
-[] s=5 & orientation_correct=true & reward_present=false -> (missed_reward'=true) & (s'=6);
+[timed] s=5 & orientation_correct=true & reward_present=true -> (collected_reward' = true) & (s'=6);
+[timed] s=5 & orientation_correct=true & reward_present=false -> (missed_reward'=true) & (s'=6);
 
 
 
@@ -51,12 +51,17 @@ module reward_spawner
 
 c1 : [0..delay] init 0; //reward spawn delay counter
 c2 : [0..reward_lifetime] init 0; //reward lifetime counter
+spwnd : bool init false;
+despwnd : bool init false;
 
-[] c1=delay -> 1 : (reward_present'=true) & (c1'=0); //spawn reward after "delay" steps
-[] s=3 & c1<delay-> 1: (c1'=c1+1);  //increment reward spawn counter
+[timed] spwnd=false & c1=delay -> 1 : (spwnd'=true) & (c1'=0); //spawn reward after "delay" steps
+[timed] spwnd=false & c1<delay-> 1: (c1'=c1+1);  //increment reward spawn counter
 
-[] reward_present=true & c2=reward_lifetime -> 1 : (reward_present'=false); //despawn reward after "reward_lifetime" steps
-[] reward_present=true & c2<reward_lifetime -> 1 : (c2'=c2+1); //increment reward despawn counter
+[timed] spwnd=true & c2=reward_lifetime -> 1 : (despwnd'=true); //despawn reward after "reward_lifetime" steps
+[timed] spwnd=true & c2<reward_lifetime -> 1 : (c2'=c2+1); //increment reward despawn counter
+
+[] spwnd=true -> 1: (reward_present'=true); //spawn reward
+[] despwnd=true -> 1: (reward_present'=false); //despawn reward
 
 endmodule
 
