@@ -2,19 +2,20 @@ dtmc
 
 const int approach_gap; //int defining the boundary of the pf associated with reward
 const int wait_at_gap; //int defining boundary of area "next to" gap containing reward
-const int l; //size of the scale representing the entire explorable area
+const int l; //size of the scale representing the entire explorable area (add 10 as a safety buffer)
 const int delay; //number of steps to wait to spawn reward once agent waits at gap
-const int reward_lifetime;
+const int reward_lifetime; //number of steps to wait before reward despawns after its instantiation
 
 global reward_present : bool init false; 
+global at_gap : bool init false;
 
 
 module limbic_system
 
 
 
-vis1 : [0..1] init 0;//1 if agent can see the gap
-vis2: [0..5] init 0;//1 if agent can see the reward
+vis1 : [0..1] init 0;//speed gained when agent can see gap
+vis2: [0..5];// speed gained when agent can see reward
 _5ht : [0..3] init 0;// serotonin/5HTR1/5HTR2 value
 pos : [0..100] init 0;//position of agent
 s : [0..10] init 0;  //state counter to help ordering of events
@@ -32,7 +33,7 @@ missed_reward : bool init false;
 
 [] s=1 & pos>=approach_gap -> 1 : (_5ht'=1) & (s'=2); //enter the placefield and increase 5ht
 
-[] s=2 & pos>=wait_at_gap -> 1 : (_5ht'=3) & (s'=3); //slow down if front of gap, expected to contain reward
+[] s=2 & pos>=wait_at_gap -> 1 : (_5ht'=3) & (s'=3) & (at_gap'=true); //slow down if front of gap, expected to contain reward
 
 [timed] s=3 & reward_present=true & vis2=0 -> 1 : (vis2'=5); //agent sees reward and 
 [timed] s=3 & pos>=(l-10) -> 1: (s'=4); //agent reaches reward location; update state counter
@@ -54,13 +55,14 @@ c2 : [0..reward_lifetime] init 0; //reward lifetime counter
 spwnd : bool init false;
 despwnd : bool init false;
 
-[timed] spwnd=false & c1=delay -> 1 : (spwnd'=true) & (c1'=0); //spawn reward after "delay" steps
-[timed] spwnd=false & c1<delay-> 1: (c1'=c1+1);  //increment reward spawn counter
+[timed] at_gap=false -> 1: (c1'=0);
+[timed] at_gap=true & spwnd=false & c1=delay -> 1 : (spwnd'=true) & (c1'=0); //spawn reward after "delay" steps
+[timed] at_gap=true & spwnd=false & c1<delay-> 1: (c1'=c1+1);  //increment reward spawn counter
 
-[timed] spwnd=true & c2=reward_lifetime -> 1 : (despwnd'=true); //despawn reward after "reward_lifetime" steps
-[timed] spwnd=true & c2<reward_lifetime -> 1 : (c2'=c2+1); //increment reward despawn counter
+[timed] at_gap=true & spwnd=true & c2=reward_lifetime -> 1 : (despwnd'=true); //despawn reward after "reward_lifetime" steps
+[timed] at_gap=true & spwnd=true & c2<reward_lifetime -> 1 : (c2'=c2+1); //increment reward despawn counter
 
-[] spwnd=true -> 1: (reward_present'=true); //spawn reward
+[] spwnd=true & despwnd=false -> 1: (reward_present'=true); //spawn reward
 [] despwnd=true -> 1: (reward_present'=false); //despawn reward
 
 endmodule
