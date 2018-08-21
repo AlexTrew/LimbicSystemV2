@@ -14,8 +14,8 @@ module limbic_system
 
 
 
-vis1 : [0..1] init 0;//speed gained when agent can see gap
-vis2: [0..5];// speed gained when agent can see reward
+vis1 : [0..1] init 0;//visual input to speed gained when agent can see gap
+vis2: [0..5];//  visual input to speed gained when agent can see reward
 _5ht : [0..3] init 0;// serotonin/5HTR1/5HTR2 value
 pos : [0..100] init 0;//position of agent
 s : [0..10] init 0;  //state counter to help ordering of events
@@ -69,6 +69,6 @@ endmodule
 
 
 
-formula speed = ((3 - _5ht) + x);
+formula speed = ((3 - _5ht) + x); //simplified formula where _5ht acts as an inhibitor
 
-formula x = vis1 + vis2;
+formula x = vis1 + vis2; //speed based on visual inputs
