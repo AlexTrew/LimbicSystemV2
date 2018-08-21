@@ -4,6 +4,7 @@ const int approach_gap; //int defining the boundary of the pf associated with re
 const int wait_at_gap; //int defining boundary of area "next to" gap containing reward
 const int l; //size of the scale representing the entire explorable area
 const int delay; //number of steps to wait to spawn reward once agent waits at gap
+const int reward_lifetime;
 
 global reward_present : bool init false;
 global s : [0..10] init 0;  //state counter to help ordering of events
@@ -33,7 +34,7 @@ missed_reward : bool init false;
 
 [] s=2 & pos>=wait_at_gap -> 1 : (_5ht'=3) & (s'=3); //slow down if front of gap, expected to contain reward
 
-[] s=3 & reward_present=true & vis2=0 -> 1 : (vis2'=5) & (s'=4); //agent sees reward and 
+[] s=3 & reward_present=true & vis2=0 -> 1 : (vis2'=5); //agent sees reward and 
 [] s=3 & pos>=(l-10) -> 1: (s'=4); //agent reaches reward location; update state counter
 
 [] s=4 -> 0.2: (orientation_correct'=true) & (s'=5) + 0.8 : (orientation_correct'=false) & (s'=4); //correct orientation to get to reward location
@@ -48,10 +49,14 @@ endmodule
 
 module reward_spawner
 
-c : [0..delay] init 0;
+c1 : [0..delay] init 0; //reward spawn delay counter
+c2 : [0..reward_lifetime] init 0; //reward lifetime counter
 
-[] c=delay -> 1 : (reward_present'=true); 
-[] s=3 & c<delay-> 1: (c'=c+1);
+[] c1=delay -> 1 : (reward_present'=true) & (c1'=0); //spawn reward after "delay" steps
+[] s=3 & c1<delay-> 1: (c1'=c1+1);  //increment reward spawn counter
+
+[] reward_present=true & c2=reward_lifetime -> 1 : (reward_present'=false); //despawn reward after "reward_lifetime" steps
+[] reward_present=true & c2<reward_lifetime -> 1 : (c2'=c2+1); //increment reward despawn counter
 
 endmodule
 
