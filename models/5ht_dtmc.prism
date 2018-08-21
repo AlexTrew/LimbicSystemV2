@@ -40,8 +40,12 @@ missed_reward : bool init false;
 
 [timed] s=4 -> 0.2: (orientation_correct'=true) & (s'=5) + 0.8 : (orientation_correct'=false) & (s'=4); //correct orientation to get to reward location
 
-[timed] s=5 & orientation_correct=true & reward_present=true -> (collected_reward' = true) & (s'=6);
-[timed] s=5 & orientation_correct=true & reward_present=false -> (missed_reward'=true) & (s'=6);
+[timed] s=5 & orientation_correct=true & reward_present=true -> (collected_reward' = true);
+[timed] s=5 & orientation_correct=true & reward_present=false -> (missed_reward'=true);
+
+[] collected_reward=true -> 1: (s'=6);
+[] missed_reward=true -> 1: (s'=6);
+
 
 
 
