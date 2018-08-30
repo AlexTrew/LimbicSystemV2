@@ -7,17 +7,17 @@ const int delay; //number of steps to wait to spawn reward once agent waits at g
 const int reward_lifetime; //number of steps to wait before reward despawns after its instantiation
 
 global reward_present : bool init false; 
-global at_gap : bool init false;
+global at_gap : bool init false; //agent is slowing in fornt of the gap the gap
 
-
+//1/6 probablility that alpha 1 or alpha 2 angle
 module limbic_system
 
 
 
 vis1 : [0..1] init 0;//visual input to speed gained when agent can see gap
-vis2: [0..5];//  visual input to speed gained when agent can see reward
+vis2: [0..1];//  visual input to speed gained when agent can see reward
 _5ht : [0..3] init 0;// serotonin/5HTR1/5HTR2 value
-pos : [0..100] init 0;//position of agent
+pos : [0..200] init 0;//position of agent
 s : [0..10] init 0;  //state counter to help ordering of events
 
 
@@ -31,11 +31,13 @@ missed_reward : bool init false;
 
 [timed] pos<(l-10) & s>=1 -> 1: (pos'=pos+speed); //update position by speed each step
 
-[] s=1 & pos>=approach_gap -> 1 : (_5ht'=1) & (s'=2); //enter the placefield and increase 5ht
+// timed syncronises agent movement with the counters controlling the spawning and despawning of the reward
+
+[] s=1 & pos>=approach_gap -> 1 : (_5ht'=1) & (s'=2); //enter the placefield and increase 5ht (increase to 3!!!)
 
 [] s=2 & pos>=wait_at_gap -> 1 : (_5ht'=3) & (s'=3) & (at_gap'=true); //slow down if front of gap, expected to contain reward
 
-[timed] s=3 & reward_present=true & vis2=0 -> 1 : (vis2'=5); //agent sees reward and 
+[timed] s=3 & reward_present=true & vis2=0 -> 1 : (vis2'=1); //agent sees reward and 
 [timed] s=3 & pos>=(l-10) -> 1: (s'=4); //agent reaches reward location; update state counter
 
 [timed] s=4 -> 0.2: (orientation_correct'=true) & (s'=5) + 0.8 : (orientation_correct'=false) & (s'=4); //correct orientation to get to reward location
@@ -73,6 +75,8 @@ endmodule
 
 
 
-formula speed = ((3 - _5ht) + x); //simplified formula where _5ht acts as an inhibitor
+
 
 formula x = vis1 + vis2; //speed based on visual inputs
+
+formula speed = ((_5ht=0 & x=1)?5:(_5ht=1 & x=1)?6:(_5ht=1 & x=2)?8:(_5ht=3 & x=1)?1:(_5ht=3 & x=2)?10:0);//speed lookup based on Figure 3 in Bernd paper
