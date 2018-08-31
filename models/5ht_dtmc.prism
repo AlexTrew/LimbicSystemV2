@@ -6,6 +6,8 @@ const int l; //size of the scale representing the entire explorable area (add 10
 const int delay; //number of steps to wait to spawn reward once agent waits at gap
 const int reward_lifetime; //number of steps to wait before reward despawns after its instantiation
 
+const double correct_angle_prob = 0.4;
+
 global reward_present : bool init false; 
 global at_gap : bool init false; //agent is slowing in fornt of the gap the gap
 
@@ -21,7 +23,7 @@ pos : [0..200] init 0;//position of agent
 s : [0..10] init 0;  //state counter to help ordering of events
 
 
-
+approach_angle_correct : bool init false;
 orientation_correct : bool init false;
 at_reward : bool init false;
 collected_reward : bool init false;
@@ -29,11 +31,11 @@ missed_reward : bool init false;
 
 [] s=0 -> 0.2 : (vis1'=1) & (s'=1) + 0.8 : (vis1'=0) & (s'=0); // see area containing reward and end exploration
 
-[timed] pos<(l-10) & s>=1 -> 1: (pos'=pos+speed); //update position by speed each step
+[timed] pos<(l-10) & s>=1 & s<6 -> 1: (pos'=pos+speed); //update position by speed each step
 
 // timed syncronises agent movement with the counters controlling the spawning and despawning of the reward
 
-[] s=1 & pos>=approach_gap -> 1 : (_5ht'=1) & (s'=2); //enter the placefield and increase 5ht (increase to 3!!!)
+[] s=1 & pos>=approach_gap -> correct_angle_prob : (_5ht'=1) & (s'=2) + (1-correct_angle_prob) : (missed_reward'=true) & (s'=6); //enter the placefield and increase 5ht (increase to 3!!!)
 
 [] s=2 & pos>=wait_at_gap -> 1 : (_5ht'=3) & (s'=3) & (at_gap'=true); //slow down if front of gap, expected to contain reward
 
