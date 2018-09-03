@@ -6,7 +6,11 @@ const int l; //size of the scale representing the entire explorable area (add 10
 const int delay; //number of steps to wait to spawn reward once agent waits at gap
 const int reward_lifetime; //number of steps to wait before reward despawns after its instantiation
 
-const double correct_angle_prob = 0.4;
+const double see_reward_approach_perpendicular = 1;
+const double see_reward_approach_pi_over_8 = 0.5;
+const double see_reward_approach_mt_pi_over_4 = 0;
+const double see_reward_approach_neg_pi_over_8 = 0.5;
+const double see_reward_approach_neg_lt_pi_over_4 = 0;
 
 global reward_present : bool init false; 
 global at_gap : bool init false; //agent is slowing in fornt of the gap the gap
@@ -20,7 +24,11 @@ vis1 : [0..1] init 0;//visual input to speed gained when agent can see gap
 vis2: [0..1];//  visual input to speed gained when agent can see reward
 _5ht : [0..3] init 0;// serotonin/5HTR1/5HTR2 value
 pos : [0..200] init 0;//position of agent
+
+ac : [0..6] init 0; //angle counter: used to specify what agent's angle of approach to the placefield will be.
+
 s : [0..10] init 0;  //state counter to help ordering of events
+
 
 
 approach_angle_correct : bool init false;
@@ -29,13 +37,22 @@ at_reward : bool init false;
 collected_reward : bool init false;
 missed_reward : bool init false;
 
+[] ac=0 & s=0 -> 0.2 : (ac'=1) + 0.2 : (ac'=2) + 0.2 : (ac'=3) + 0.2 : (ac'=4) + 0.2 : (ac'=5);
+
 [] s=0 -> 0.2 : (vis1'=1) & (s'=1) + 0.8 : (vis1'=0) & (s'=0); // see area containing reward and end exploration
 
 [timed] pos<(l-10) & s>=1 & s<6 -> 1: (pos'=pos+speed); //update position by speed each step
 
 // timed syncronises agent movement with the counters controlling the spawning and despawning of the reward
 
-[] s=1 & pos>=approach_gap -> correct_angle_prob : (_5ht'=1) & (s'=2) + (1-correct_angle_prob) : (missed_reward'=true) & (s'=6); //enter the placefield and increase 5ht (increase to 3!!!)
+
+// choose an angle of approach using the angle counter and use the corresponding probablilty of seeing the reward for the approach.
+
+[] s=1 & pos>=approach_gap & ac=1 -> see_reward_approach_perpendicular : (_5ht'=1) & (s'=2) + (1-see_reward_approach_perpendicular) : (missed_reward'=true) & (s'=6); //enter the placefield and increase 5ht (increase to 3!!!)
+[] s=1 & pos>=approach_gap & ac=2  -> see_reward_approach_pi_over_8 : (_5ht'=1) & (s'=2) + (1-see_reward_approach_pi_over_8) : (missed_reward'=true) & (s'=6);
+[] s=1 & pos>=approach_gap & ac=3 -> see_reward_approach_mt_pi_over_4 : (_5ht'=1) & (s'=2) + (1-see_reward_approach_mt_pi_over_4) : (missed_reward'=true) & (s'=6);
+[] s=1 & pos>=approach_gap & ac=4 -> see_reward_approach_neg_pi_over_8 : (_5ht'=1) & (s'=2) + (1-see_reward_approach_neg_pi_over_8) : (missed_reward'=true) & (s'=6);
+[] s=1 & pos>=approach_gap & ac=5 -> see_reward_approach_neg_lt_pi_over_4 : (_5ht'=1) & (s'=2) + (1-see_reward_approach_neg_lt_pi_over_4) : (missed_reward'=true) & (s'=6);
 
 [] s=2 & pos>=wait_at_gap -> 1 : (_5ht'=3) & (s'=3) & (at_gap'=true); //slow down if front of gap, expected to contain reward
 
